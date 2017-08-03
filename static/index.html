@@ -1,0 +1,261 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>会议室预订</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <style>
+        hr {
+            margin: 20px 0;
+        }
+
+        .grab-wrap {
+            margin: 20px;
+        }
+
+        .form-wrap {
+            margin: auto;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+<div class="grab-wrap">
+    <form class="form-horizontal form-wrap">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">个人信息</label>
+            <div class="col-sm-10 J-user">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会议名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control J-title" value="会议">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会议日期</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control J-date" data-date-format="yyyy-mm-dd">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会议室</label>
+            <div class="col-sm-10">
+                <select class="form-control J-room"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会议时间</label>
+            <div class="col-sm-10">
+                <div class="form-inline">
+                    <select class="form-control J-start-hour">
+                        <option>09</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                        <option>13</option>
+                        <option selected="selected">14</option>
+                        <option>15</option>
+                        <option>16</option>
+                        <option>17</option>
+                        <option>18</option>
+                        <option>19</option>
+                        <option>20</option>
+                    </select>
+                    :
+                    <select class="form-control J-start-minute">
+                        <option selected="selected">00</option>
+                        <option>15</option>
+                        <option>30</option>
+                        <option>45</option>
+                    </select>
+                    至
+                    <select class="form-control J-end-hour">
+                        <option>09</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                        <option>13</option>
+                        <option>14</option>
+                        <option selected="selected">15</option>
+                        <option>16</option>
+                        <option>17</option>
+                        <option>18</option>
+                        <option>19</option>
+                        <option>20</option>
+                    </select>
+                    :
+                    <select class="form-control J-end-minute">
+                        <option selected="selected">00</option>
+                        <option>15</option>
+                        <option>30</option>
+                        <option>45</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10 J-tips text-danger"
+                 style="text-align: right; padding-right: 20px; line-height: 34px;"></div>
+            <button type="button" class="btn btn-primary col-sm-2 J-submit">提交</button>
+        </div>
+        <div class="alert J-result" role="alert"></div>
+    </form>
+    <table class="table table-striped J-table">
+        <thead>
+        <tr>
+            <th>会议室</th>
+            <th>会议名</th>
+            <th>时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody class="J-tb"></tbody>
+    </table>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.18.1/moment.min.js"></script>
+<script>
+  !function () {
+    var $user = $('.J-user'),
+      $title = $('.J-title'),
+      $date = $('.J-date'),
+      $room = $('.J-room'),
+      $startHour = $('.J-start-hour'),
+      $startMinute = $('.J-start-minute'),
+      $endHour = $('.J-end-hour'),
+      $endMinute = $('.J-end-minute'),
+      $tips = $('.J-tips'),
+      $submit = $('.J-submit'),
+      $result = $('.J-result'),
+      $tb = $('.J-tb');
+
+    $result.hide();
+
+    // 8点后可订第14天会议室
+    var overday = moment().get('hour') >= 8 ? 1 : 0;
+    $date.val(moment().add(13 + overday, 'd').format('YYYY-MM-DD')).datepicker({
+      autoclose: true,
+      todayHighlight: true,
+      startDate: '+' + (13 + overday) + 'd',
+      endDate: '+' + (15 + overday) + 'd'
+    });
+
+    $.ajax('/user').done(function (data) {
+      data = data.data;
+      $user.html(`<span class="help-block"><img src="${data.icon}" style="width: 20px; height: 20px;" alt>${data.name}(${data.mis})</span>`);
+    });
+    var roomList = [];
+    $.ajax('/room').done(function (data) {
+      if (data && data.status === 1) {
+        roomList = data.data.pageList;
+        $room.html(roomList.map(function (item, idx) {
+          var room = item.room;
+          return `<option value=${idx}>${room.name}(${room.capacity}人 ${room.equipName})</option>`;
+        }).join('\n'));
+      } else {
+        $.cookie('ssoid', '', {expires: -1, path: '/'});
+        location.reload();
+      }
+    }).fail(function () {
+      $.cookie('ssoid', '', {expires: -1, path: '/'});
+      location.reload();
+    });
+
+    var trTemplate = function (item) {
+      return `<tr class="J-${item.id}">
+<td>${item.roomName}</td>
+<td>${item.title}</td>
+<td>${moment(+item.startTime).format('YYYY-MM-DD HH:mm')} - ${moment(+item.endTime).format('HH:mm')}</td>
+<td>${TASK_STATUS[item.status]}</td>
+<td><button type="button" class="btn btn-primary J-delete" data-id="${item.id}">删除</button></td>
+</tr>`;
+    };
+
+    $submit.on('click', function () {
+      var $btn = $(this).button('loading');
+      var title = $title.val().trim();
+      var date = moment($date.val(), 'YYYY-MM-DD');
+      var startTime = +date.set({
+        hour: +$startHour.val(),
+        minute: +$startMinute.val()
+      });
+      var endTime = +date.set({
+        hour: +$endHour.val(),
+        minute: +$endMinute.val()
+      });
+      var roomIdx = +$room.val();
+      var roomId = -1;
+      var roomEmail = null;
+      var roomName = null;
+      if (roomList[roomIdx]) {
+        roomId = roomList[roomIdx].room.id;
+        roomEmail = roomList[roomIdx].room.email;
+        roomName = roomList[roomIdx].room.name;
+      }
+
+      var flag = true;
+      var warn = function (txt, pass) {
+        $tips.text(txt);
+        flag = !!pass;
+      };
+      warn('', true);
+      if (!title.length) {
+        warn('请输入会议名称！');
+      } else if (startTime >= endTime) {
+        warn('起止日期时间有误！');
+      } else if (roomId === -1) {
+        warn('请选择房间！');
+      }
+      if (flag) {
+        $.ajax('/save', {
+          method: 'POST',
+          data: {
+            title, startTime, endTime, roomId, roomEmail, roomName
+          }
+        }).done(function (data) {
+          $tips.text(data.msg);
+          $btn.button('reset');
+          if (data.status === 0) {
+            $(trTemplate(data.data)).prependTo($tb);
+          }
+        }).fail(function (data) {
+          $tips.text('网络异常！');
+          $btn.button('reset');
+        });
+      } else {
+        $btn.button('reset');
+      }
+    });
+
+    const TASK_STATUS = ['pending', 'success', 'fail'];
+    $.ajax('/list').done(function (data) {
+      if (data.status === 0) {
+        $(data.data.map(function (item) {
+          return trTemplate(item);
+        }).join('\n')).appendTo($tb);
+      }
+    });
+
+    $tb.delegate('.J-delete', 'click', function () {
+      var id = $(this).data('id');
+      $.ajax('/delete', {
+        method: 'POST',
+        data: {
+          id
+        }
+      }).done(function () {
+        $('.J-' + id).remove();
+      });
+    });
+  }()
+</script>
+</body>
+</html>

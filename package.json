@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "axios": "^0.16.2",
+    "co": "^4.6.0",
+    "cron": "^1.2.1",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.2.1",
+    "koa-send": "^4.1.0",
+    "lowdb": "^0.16.2",
+    "moment": "^2.18.1",
+    "node-fetch": "^1.7.1",
+    "shelljs": "^0.7.8",
+    "ua-device": "^0.1.9",
+    "uuid": "^3.1.0"
+  },
+  "name": "node-book",
+  "version": "0.27.5",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

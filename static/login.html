@@ -1,0 +1,49 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登陆</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        hr {
+            margin: 20px 0;
+        }
+        .grab-wrap {
+            margin: 20px;
+        }
+        .form-wrap {
+            margin: auto;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+<div class="grab-wrap">
+    <form class="form-horizontal form-wrap">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">ssoid</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control J-token">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10 J-tips" style="text-align: right; padding-right: 20px; line-height: 34px;"></div>
+            <button type="button" class="btn btn-primary col-sm-2 J-submit">登陆</button>
+        </div>
+        <ol>
+            <li>登陆<a href="https://huiyi.sankuai.com/" target="_blank">会议管理系统</a></li>
+            <li>获取cookie中的ssoid填入本页面</li>
+        </ol>
+    </form>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    $('.J-submit').one('click', function() {
+      $.cookie('ssoid', $('.J-token').val(), {expires: 3, path: '/'});
+      location.reload();
+    });
+</script>
+</body>
+</html>
