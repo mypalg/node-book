@@ -35,6 +35,7 @@ router.get('/user', async ctx => {
   try {
     ctx.body = await ajax.getUserInfo();
   } catch (e) {
+    console.log(e);
     ctx.status = e.response.status;
     ctx.body = e.response.data;
   }
@@ -43,6 +44,7 @@ router.get('/room', async ctx => {
   try {
     ctx.body = await ajax.getRoomList({});
   } catch (e) {
+    console.log(e);
     ctx.status = e.response.status;
     ctx.body = e.response.data;
   }
