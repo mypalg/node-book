@@ -45,3 +45,4 @@ dist/
 node_modules/
 jscoverage_lib/
 cortex_modules/
+db/db.json
