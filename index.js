@@ -7,7 +7,6 @@ const uuidV4 = require('uuid/v4');
 const moment = require('moment');
 const ajax = require('./lib/ajax');
 
-require('./db/initialize');
 const schedule = require('./lib/schedule');
 const task = require('./lib/task');
 
