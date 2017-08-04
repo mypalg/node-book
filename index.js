@@ -108,8 +108,8 @@ router.post('/save', async ctx => {
     task.addTask(item);
     schedule.addSchedule({
       id: item.id,
-      time: +moment(+appointment.startTime).set({
-        hour: 0,
+      time: +moment(+appointment.startTime).subtract(13, 'days').set({
+        hour: 8,
         minute: 0
       })
     });
@@ -126,8 +126,8 @@ router.post('/save', async ctx => {
 });
 
 const job = require('./lib/job');
-router.get('/batch', async ctx => {
-  job.batchAppoint(+moment('2017-08-10', 'YYYY-MM-DD'));
+router.get('/batch/:time', async ctx => {
+  job.batchAppoint(ctx.params.time === -1 ? +moment() : +ctx.params.time);
 });
 
 app.use(router.routes()).use(router.allowedMethods());
