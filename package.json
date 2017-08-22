@@ -9,6 +9,7 @@
     "koa-send": "^4.1.0",
     "lowdb": "^0.16.2",
     "moment": "^2.18.1",
+    "node-cache": "^4.1.1",
     "node-fetch": "^1.7.1",
     "shelljs": "^0.7.8",
     "ua-device": "^0.1.9",

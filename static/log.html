@@ -1,0 +1,67 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>执行日志</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <style>
+        hr {
+            margin: 20px 0;
+        }
+
+        .grab-wrap {
+            margin: 20px;
+        }
+
+        .form-wrap {
+            margin: auto;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+<div class="grab-wrap">
+    <table class="table table-striped J-table">
+        <thead>
+        <tr>
+            <th>会议室</th>
+            <th>时间</th>
+            <th>预订人</th>
+            <th>status</th>
+            <th>response</th>
+        </tr>
+        </thead>
+        <tbody class="J-tb"></tbody>
+    </table>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-datepicker/1.7.1/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.18.1/moment.min.js"></script>
+<script>
+    !function() {
+      $.ajax('/loglist').done(function (data) {
+        if (data && data.status === 1) {
+          $('.J-tb').html(data.data.map(function(item) {
+            return `<tr>
+<td>${item.roomName}</td>
+<td>${moment(+item.startTime).format('YYYY-MM-DD HH:mm')} - ${moment(+item.endTime).format('HH:mm')}</td>
+<td>${item.userName}(${item.userMis})</td>
+<td>${item.status}</td>
+<td><code style="white-space: pre;">${JSON.stringify(item.result, null, 4)}</code></td>
+</tr>`}).join('\n'));
+        } else {
+          $.cookie('ssoid', '', {expires: -1, path: '/'});
+          location.reload();
+        }
+      }).fail(function () {
+        $.cookie('ssoid', '', {expires: -1, path: '/'});
+        location.reload();
+      });
+    }();
+</script>
+</body>
+</html>

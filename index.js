@@ -9,6 +9,7 @@ const ajax = require('./lib/ajax');
 
 const schedule = require('./lib/schedule');
 const task = require('./lib/task');
+const log = require('./lib/log');
 
 require('./lib/cronjob');
 
@@ -22,27 +23,37 @@ router.get('/', async ctx => {
   }
 });
 
+router.get('/log', async ctx => {
+  if (ctx.cookies.get('ssoid')) {
+    await send(ctx, 'static/log.html');
+  } else {
+    await send(ctx, 'static/login.html');
+  }
+});
+
 router.get('/static/*', async ctx => {
   await send(ctx, ctx.path);
 });
 
 router.use(async (ctx, next) => {
-  ajax.setSsoId(ctx.cookies.get('ssoid'));
+  ctx.state.ssoid = ctx.cookies.get('ssoid');
+  ajax.setSsoId(ctx.state.ssoid);
   await next();
 });
 
 router.get('/user', async ctx => {
   try {
-    ctx.body = await ajax.getUserInfo();
+    ctx.body = await ajax.getUserInfo(ctx.state.ssoid);
   } catch (e) {
     console.log(e);
     ctx.status = e.response.status;
     ctx.body = e.response.data;
   }
 });
+
 router.get('/room', async ctx => {
   try {
-    ctx.body = await ajax.getRoomList({});
+    ctx.body = await ajax.getRoomList({}, ctx.state.ssoid);
   } catch (e) {
     console.log(e);
     ctx.status = e.response.status;
@@ -51,7 +62,7 @@ router.get('/room', async ctx => {
 });
 
 router.get('/list', async ctx => {
-  let userInfo = (await ajax.getUserInfo()).data;
+  let userInfo = (await ajax.getUserInfo(ctx.state.ssoid)).data;
   ctx.body = {
     status: 0,
     data: task.getTasksByUserMis(userInfo.mis).map(function (item) {
@@ -59,9 +70,23 @@ router.get('/list', async ctx => {
     })
   };
 });
+
+const ADMIN_EMPID = 1027691;
+router.get('/loglist', async ctx => {
+  let userInfo = (await ajax.getUserInfo(ctx.state.ssoid)).data;
+  if (userInfo.empId === ADMIN_EMPID) {
+    ctx.body = {
+      status: 1,
+      data: log.getList()
+    };
+  } else {
+    ctx.status = 401;
+  }
+});
+
 router.post('*', bodyParser());
 router.post('/delete', async ctx => {
-  let userInfo = (await ajax.getUserInfo()).data;
+  let userInfo = (await ajax.getUserInfo(ctx.state.ssoid)).data;
   let id = ctx.request.body.id;
 
   let deleteRecords = task.deleteTaskById({id, mis: userInfo.mis});
@@ -93,7 +118,7 @@ router.post('/save', async ctx => {
       return;
     }
 
-    let userInfo = (await ajax.getUserInfo()).data;
+    let userInfo = (await ajax.getUserInfo(ctx.state.ssoid)).data;
     let item = {
       id: uuidV4(),
       status: 0,
@@ -101,7 +126,7 @@ router.post('/save', async ctx => {
         mis: userInfo.mis,
         name: userInfo.name,
         email: userInfo.email,
-        ssoid: ctx.cookies.get('ssoid')
+        ssoid: ctx.state.ssoid
       },
       appointment
     };
