@@ -12,6 +12,7 @@ const task = require('./lib/task');
 const log = require('./lib/log');
 
 require('./lib/cronjob');
+require('./db/initialize');
 
 const app = new Koa();
 
