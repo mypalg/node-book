@@ -30,6 +30,7 @@
             <th>预订人</th>
             <th>status</th>
             <th>response</th>
+            <th>log time</th>
         </tr>
         </thead>
         <tbody class="J-tb"></tbody>
@@ -52,6 +53,7 @@
 <td>${item.userName}(${item.userMis})</td>
 <td>${item.status}</td>
 <td><code style="white-space: pre;">${JSON.stringify(item.result, null, 4)}</code></td>
+<td>${moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</td>
 </tr>`}).join('\n'));
         } else {
           $.cookie('ssoid', '', {expires: -1, path: '/'});
