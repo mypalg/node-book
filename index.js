@@ -75,7 +75,7 @@ router.get('/list', async ctx => {
 const ADMIN_EMPID = 1027691;
 router.get('/loglist', async ctx => {
   let userInfo = (await ajax.getUserInfo(ctx.state.ssoid)).data;
-  if (userInfo.empId === ADMIN_EMPID) {
+  if (""+userInfo.empId === ""+ADMIN_EMPID) {
     ctx.body = {
       status: 1,
       data: log.getList()
