@@ -302,8 +302,8 @@ koa@^2.3.0:
     vary "^1.0.0"
 
 lodash@4, lodash@4.x:
-  version "4.17.4"
-  resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
 
 lowdb@^0.16.2:
   version "0.16.2"
